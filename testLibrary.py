@@ -13,6 +13,9 @@ timeS = time.time()
 N = 28
 class_num = 10
 feature_len = 784
+time_0 = time.time()
+train_num = 60000
+test_num = 10000
 # ALLROWS = 60000
 
 def all_np(arr):
@@ -29,21 +32,21 @@ def all_np(arr):
     return label_num
 
 
-def getTrainSet():
+def get_train_set():
     f = open('data.csv', 'wb')
     category = MR.read_label('train-labels.idx1-ubyte', 'train/label.txt')
 
-    fileNames = os.listdir(r"./train/", )
-    train_picture = np.zeros([len(fileNames)-1, N ** 2 + 1])
+    # file_names = os.listdir(r"./train/", )
+    train_picture = np.zeros([train_num, N ** 2 + 1])
     # 遍历文件，转为向量存储
-    for file in range(len(fileNames)-1):
+    for file in range(train_num):
         img_num = io.imread('./train/%d.png' % (file))
         # img_cut = RI.cutImage(img_num)
         # dst = transform.resize(img_num, (N, N), mode='constant', anti_aliasing=True)
         rows, cols = img_num.shape
         for i in range(rows):
             for j in range(cols):
-                if (img_num[i, j] < 100):
+                if img_num[i, j] < 100:
                     img_num[i, j] = 0
                 else:
                     img_num[i, j] = 1
@@ -56,19 +59,16 @@ def getTrainSet():
     print('process data train cost ', time_e - time_0, ' seconds', '\n')
     return train_picture
 
-def getTestSet():
+def get_test_set():
     f = open('dataTest.csv', 'wb')
-
-
-    timeS = time.time()
-
+    time_t = time.time()
     # 读取num目录下的所有文件名
-    fileNames = os.listdir(r"./test/", )
+    # fileNames = os.listdir(r"./test/", )
 
     category_test = MR.read_label('t10k-labels.idx1-ubyte', 'test/label.txt')
-    test_picture = np.zeros([len(fileNames)-1, N ** 2 + 1])
+    test_picture = np.zeros([test_num, N ** 2 + 1])
     # 遍历文件，转为向量存储
-    for file in range(len(fileNames)-1):
+    for file in range(test_num):
         img_num = io.imread('./test/%d.png' % (file))
         # img_cut = RI.cutImage(img_num)
         # dst = transform.resize(img_cut, (N, N), mode='constant', anti_aliasing=True)
@@ -202,20 +202,19 @@ def Predict(testset, test_labels):
         predict.append(max_label)
         if max_label == test_labels[row]:
             right += 1
-        if (row+1) % 200 == 0:
+        if (row+1) % 500 == 0:
             accuracy.append(float(right)/(row+1))
-        # print(" picture %d: real num is %d , predict num is %d" % (row, test_labels[row], max_label))
     return float(right)/len(test_labels), np.array(predict), accuracy
 
 
 if __name__ == '__main__':
     print('Start process train data')
     time_0 = time.time()
-    getTrainSet()
+    # get_train_set()
 
     print('Start process test data')
     time_t = time.time()
-    getTestSet()
+    get_test_set()
 
     print ('Start read train data')
     time_1 = time.time()
@@ -241,10 +240,10 @@ if __name__ == '__main__':
     time_6 = time.time()
     print('predicting cost ', time_6 - time_5, ' seconds', '\n')
 
-    new_ticks = np.linspace(1, 100, 50)
+    new_ticks = np.linspace(1, 20, 20)
     plt.xticks(new_ticks)
     plt.plot(new_ticks, accuracy, 'o-', color='g')
-    plt.xlabel("x")
+    plt.xlabel("x -- 1:500")
     plt.ylabel("y")
     plt.title(u"预测准确率")
     plt.show()

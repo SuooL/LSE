@@ -4,7 +4,6 @@
 from PIL import Image
 import struct
 
-
 def read_image(filename):
     f = open(filename, 'rb')
 
@@ -57,6 +56,5 @@ def read_label(filename, saveFilename):
 
 
 if __name__ == '__main__':
-    # read_image('train-images.idx3-ubyte')
+    read_image('train-images.idx3-ubyte')
     read_label('train-labels.idx1-ubyte', 'train/label.txt')
-    # 二值化

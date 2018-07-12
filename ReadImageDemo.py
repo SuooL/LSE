@@ -1,11 +1,12 @@
 import os
 from skimage import io
 import numpy as np
+from skimage import io, transform
 import cv2
 
 ##Essential vavriable 基础变量
 #Standard size 标准大小
-N = 100
+N = 28
 #Gray threshold 灰度阈值
 color = 120/255
 
@@ -29,6 +30,24 @@ color = 120/255
 # io.show()
 
 
+def StretchPicture(img):
+    '''Stretch the Picture拉伸图像'''
+    newImg1 = np.zeros(N*len(img)).reshape(len(img), N)
+    newImg2 = np.zeros(N**2).reshape(N, N)
+    # 对每一行进行拉伸/压缩
+    # 每一行拉伸/压缩的步长
+    temp1 = len(img[0])/N
+    # 每一列拉伸/压缩的步长
+    temp2 = len(img)/N
+    #对每一行进行操作
+    for i in range(len(img)):
+        for j in range(N):
+            newImg1[i, j] = img[i, int(np.floor(j*temp1))]
+    #对每一列进行操作
+    for i in range(N):
+        for j in range(N):
+            newImg2[i, j] = newImg1[int(np.floor(i*temp2)), j]
+    return newImg2
 
 def JudgeEdge(img, length, flag, size):
     '''Judge the Edge of Picture判断图片切割的边界'''
@@ -67,3 +86,27 @@ def cutImage(img):
     size.append(JudgeEdge(img, width, 1, [-1, -1]))
     size = np.array(size).reshape(4)
     return img[size[0]:size[1]+1, size[2]:size[3]+1]
+
+
+
+
+if __name__ == '__main__':
+    img_num = io.imread('./train/0.png', as_gray=True)
+    # img_cut = cutImage(img_num)
+    print(img_num)
+    # dst = transform.resize(img_cut, (N, N), mode='constant', anti_aliasing=True)
+    rows, cols = img_num.shape
+    for row in range(rows):
+        for col in range(cols):
+            if img_num[row, col] < 100:
+                img_num[row, col] = 0
+            else:
+                img_num[row, col] = 1
+
+    io.imshow(img_num)
+    io.show()
+    print(img_num)
+
+    # train_picture[file, 0:N ** 2] = img_num.reshape(N ** 2)
+    # train_picture[file, N ** 2] = category[file]
+    # print("完成处理第%d张图片" % (file + 1))
